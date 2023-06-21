@@ -88,10 +88,10 @@ class GameEngine(
     this.field.spaceObjects.forEachPair {
         (first, second) ->
       if (first.impacts(second)) {
-        if (first is Missile and second is Asteroid) {
-          /* create Explosion based on Asteroid */
-          /* delete Asteroid */
-          /* communicate visualizer */
+        if (first is Missile && second is Asteroid) {
+          this.field.newExplosion(second)
+          first.exploded = true
+          second.exploded = true
         } else {
           first.collideWith(second, GameEngineConfig.coefficientRestitution)
         }
@@ -108,6 +108,7 @@ class GameEngine(
   fun trimSpaceObjects() {
     this.field.trimAsteroids()
     this.field.trimMissiles()
+    this.field.trimExplosions()
   }
 
   fun generateAsteroids() {

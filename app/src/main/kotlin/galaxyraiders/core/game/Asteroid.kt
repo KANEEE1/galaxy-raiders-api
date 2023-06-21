@@ -9,4 +9,6 @@ class Asteroid(
   radius: Double,
   mass: Double
 ) :
-  SpaceObject("Asteroid", '.', initialPosition, initialVelocity, radius, mass)
+  SpaceObject("Asteroid", '.', initialPosition, initialVelocity, radius, mass){
+    var exploded: Boolean = false
+  }

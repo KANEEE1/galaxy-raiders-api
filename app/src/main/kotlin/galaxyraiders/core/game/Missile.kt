@@ -9,4 +9,6 @@ class Missile(
   radius: Double,
   mass: Double
 ) :
-  SpaceObject("Missile", '^', initialPosition, initialVelocity, radius, mass)
+  SpaceObject("Missile", '^', initialPosition, initialVelocity, radius, mass){
+    var exploded: Boolean = false
+  }

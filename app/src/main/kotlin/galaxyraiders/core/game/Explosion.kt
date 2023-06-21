@@ -10,6 +10,6 @@ class Explosion(
   mass: Double,
 ) :
   SpaceObject("Explosion", '*', initialPosition, initialVelocity, radius, mass) {
-  val is_triggered = false
+  var is_triggered = false
 
   }

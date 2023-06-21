@@ -64,19 +64,28 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     this.asteroids += this.createAsteroidWithRandomProperties()
   }
 
-  fun generateExplosions(explosion: Explosion) {
+/*   fun generateExplosions(explosion: Explosion) {
     this.explosions += explosion
-  }
+  } */
 
   fun trimMissiles() {
     this.missiles = this.missiles.filter {
-      it.inBoundaries(this.boundaryX, this.boundaryY)
+      it.inBoundaries(this.boundaryX, this.boundaryY) && !it.exploded
     }
   }
 
   fun trimAsteroids() {
     this.asteroids = this.asteroids.filter {
-      it.inBoundaries(this.boundaryX, this.boundaryY)
+      it.inBoundaries(this.boundaryX, this.boundaryY) && !it.exploded
+    }
+  }
+
+  fun trimExplosions() {
+    this.explosions = this.explosions.filter {
+      !it.is_triggered
+    }
+    if (this.generator.generateIntegerInRange(0,60) == 0) {
+      this.explosions.forEach { it.is_triggered = true }
     }
   }
 
@@ -114,37 +123,21 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     return Vector2D(dx = 0.0, dy = 1.0)
   }
 
-  private fun createExplosionForAsteroid(
-      initialPosition: Point2D,
-      initialVelocity: Vector2D,
-      radius: Double,
-      mass: Double,
-  ) : Explosion {
-    return Explosion(
-      initialPosition,
-      initialVelocity,
-      radius,
-      mass,
+  public fun newExplosion(asteroidThatWillExplode: Asteroid) {
+    this.explosions += Explosion(
+      initialPosition = asteroidThatWillExplode.center,
+      initialVelocity = Vector2D(0.0, 0.0),     
+      radius = asteroidThatWillExplode.radius,
+      mass = 0.00001
     )
   }
 
   private fun createAsteroidWithRandomProperties(): Asteroid {
-    val initialPosition = generateRandomAsteroidPosition(),
-    val initialVelocity = generateRandomAsteroidVelocity(),
-    val radius = generateRandomAsteroidRadius(),
-    val mass = generateRandomAsteroidMass(),
-    val explosion = createExplosionForAsteroid(
-      initialPosition,
-      initialVelocity,
-      radius,
-      mass,
-    )
-    this.generateExplosions(explosion)
     return Asteroid(
-      initialPosition,
-      initialVelocity,
-      radius,
-      mass,
+      initialPosition = generateRandomAsteroidPosition(),
+      initialVelocity = generateRandomAsteroidVelocity(),
+      radius = generateRandomAsteroidRadius(),
+      mass = generateRandomAsteroidMass(),
     )
   }
 
