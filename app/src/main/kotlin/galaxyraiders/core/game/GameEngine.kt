@@ -6,6 +6,10 @@ import galaxyraiders.ports.ui.Controller
 import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
 import kotlin.system.measureTimeMillis
+import galaxyraiders.core.score.GameScore
+import galaxyraiders.core.score.Scoreboard
+import galaxyraiders.core.score.updateScoreboard
+import galaxyraiders.core.score.getTime
 
 const val MILLISECONDS_PER_SECOND: Int = 1000
 
@@ -77,7 +81,11 @@ class GameEngine(
   }
 
   fun updateSpaceObjects() {
-    if (!this.playing) return
+    if (!this.playing){
+      val currentGame  = GameScore(getTime(), this.field.score, this.field.asteroidsDestroyed )
+      updateScoreboard(currentGame)
+      return
+    }
     this.handleCollisions()
     this.moveSpaceObjects()
     this.trimSpaceObjects()

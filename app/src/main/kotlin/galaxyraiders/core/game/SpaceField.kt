@@ -44,6 +44,10 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   val spaceObjects: List<SpaceObject>
     get() = listOf(this.ship) + this.missiles + this.asteroids + this.explosions
 
+  var asteroidsDestroyed = 0
+
+  var score = 0.0
+
   fun moveShip() {
     this.ship.move(boundaryX, boundaryY)
   }
@@ -63,10 +67,6 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
   fun generateAsteroid() {
     this.asteroids += this.createAsteroidWithRandomProperties()
   }
-
-/*   fun generateExplosions(explosion: Explosion) {
-    this.explosions += explosion
-  } */
 
   fun trimMissiles() {
     this.missiles = this.missiles.filter {
@@ -130,6 +130,12 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
       radius = asteroidThatWillExplode.radius,
       mass = 0.00001
     )
+    updateGameScore(asteroidThatWillExplode)
+  }
+
+  private fun updateGameScore(asteroid: Asteroid) {
+    this.asteroidsDestroyed++
+    this.score += asteroid.mass / asteroid.radius
   }
 
   private fun createAsteroidWithRandomProperties(): Asteroid {

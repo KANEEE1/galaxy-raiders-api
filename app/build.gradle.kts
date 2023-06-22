@@ -60,7 +60,7 @@ dependencies {
   implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
 
   // manipulate JSON
-  testImplementation("com.beust:klaxon:5.5")
+  implementation("com.beust:klaxon:5.5")
 
   // Use the Kotlin JUnit 5 integration.
   testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.6.21")
