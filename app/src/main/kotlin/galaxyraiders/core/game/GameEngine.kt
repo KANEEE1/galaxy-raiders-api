@@ -7,9 +7,8 @@ import galaxyraiders.ports.ui.Controller.PlayerCommand
 import galaxyraiders.ports.ui.Visualizer
 import kotlin.system.measureTimeMillis
 import galaxyraiders.core.score.GameScore
-import galaxyraiders.core.score.Scoreboard
-import galaxyraiders.core.score.updateScoreboard
-import galaxyraiders.core.score.getTime
+import galaxyraiders.core.score.ScoreboardFile
+import galaxyraiders.core.score.LeaderboardFile
 
 const val MILLISECONDS_PER_SECOND: Int = 1000
 
@@ -36,6 +35,10 @@ class GameEngine(
     height = GameEngineConfig.spaceFieldHeight,
     generator = generator
   )
+
+  val scoreboardFile = ScoreboardFile()
+
+  val leaderboardFile = LeaderboardFile()
 
   var playing = true
 
@@ -81,9 +84,7 @@ class GameEngine(
   }
 
   fun updateSpaceObjects() {
-    if (!this.playing){
-      val currentGame  = GameScore(getTime(), this.field.score, this.field.asteroidsDestroyed )
-      updateScoreboard(currentGame)
+    if (!this.playing) {
       return
     }
     this.handleCollisions()
@@ -130,6 +131,14 @@ class GameEngine(
   fun renderSpaceField() {
     this.visualizer.renderSpaceField(this.field)
   }
+
+  /* this function will be called once the game finish to permanent register the game score */
+  fun updateBoards() {
+    val gameScore = GameScore(this.field.score, this.field.asteroidsDestroyed)
+    this.leaderboardFile.update(gameScore)
+    this.scoreboardFile.update(gameScore)
+  }
+
 }
 
 fun <T> List<T>.forEachPair(action: (Pair<T, T>) -> Unit) {
