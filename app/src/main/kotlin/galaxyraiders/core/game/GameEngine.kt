@@ -100,7 +100,7 @@ class GameEngine(
         (first, second) ->
       if (first.impacts(second)) {
         if (first is Missile && second is Asteroid) {
-          this.field.newExplosion(second)
+          this.field.createExplosion(second)
           first.exploded = true
           second.exploded = true
         } else {

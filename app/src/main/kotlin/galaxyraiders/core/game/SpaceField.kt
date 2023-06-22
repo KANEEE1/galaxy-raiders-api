@@ -82,10 +82,16 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
 
   fun trimExplosions() {
     this.explosions = this.explosions.filter {
-      !it.is_triggered
+      !it.has_finnished
     }
-    if (this.generator.generateIntegerInRange(0,60) == 0) {
-      this.explosions.forEach { it.is_triggered = true }
+    finish_explosions()
+  }
+
+  private fun finish_explosions() {
+    this.explosions.forEach {
+      if (this.generator.generateIntegerInRange(0,60) == 0) {
+        it.has_finnished = true
+      }
     }
   }
 
@@ -123,12 +129,10 @@ data class SpaceField(val width: Int, val height: Int, val generator: RandomGene
     return Vector2D(dx = 0.0, dy = 1.0)
   }
 
-  public fun newExplosion(asteroidThatWillExplode: Asteroid) {
+  public fun createExplosion(asteroidThatWillExplode: Asteroid) {
     this.explosions += Explosion(
       initialPosition = asteroidThatWillExplode.center,
-      initialVelocity = Vector2D(0.0, 0.0),     
       radius = asteroidThatWillExplode.radius,
-      mass = 0.00001
     )
     updateGameScore(asteroidThatWillExplode)
   }
