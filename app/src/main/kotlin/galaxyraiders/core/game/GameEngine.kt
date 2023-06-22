@@ -43,6 +43,7 @@ class GameEngine(
   var playing = true
 
   fun execute() {
+    Runtime.getRuntime().addShutdownHook(Thread { updateBoards() })
     while (true) {
       val duration = measureTimeMillis { this.tick() }
 
@@ -53,6 +54,7 @@ class GameEngine(
   }
 
   fun execute(maxIterations: Int) {
+    Runtime.getRuntime().addShutdownHook(Thread { updateBoards() })
     repeat(maxIterations) {
       this.tick()
     }
