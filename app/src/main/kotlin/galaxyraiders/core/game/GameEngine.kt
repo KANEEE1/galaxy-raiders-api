@@ -43,7 +43,6 @@ class GameEngine(
   var playing = true
 
   fun execute() {
-    Runtime.getRuntime().addShutdownHook(Thread { updateBoards() })
     while (true) {
       val duration = measureTimeMillis { this.tick() }
 
@@ -54,7 +53,6 @@ class GameEngine(
   }
 
   fun execute(maxIterations: Int) {
-    Runtime.getRuntime().addShutdownHook(Thread { updateBoards() })
     repeat(maxIterations) {
       this.tick()
     }
@@ -103,6 +101,7 @@ class GameEngine(
           this.field.createExplosion(second)
           first.exploded = true
           second.exploded = true
+          this.updateBoards()
         } else {
           first.collideWith(second, GameEngineConfig.coefficientRestitution)
         }
@@ -137,8 +136,8 @@ class GameEngine(
   /* this function will be called once the game finish to permanent register the game score */
   fun updateBoards() {
     val gameScore = GameScore(this.field.score, this.field.asteroidsDestroyed)
-    this.leaderboardFile.update(gameScore)
     this.scoreboardFile.update(gameScore)
+    this.leaderboardFile.update(gameScore)
   }
 
 }

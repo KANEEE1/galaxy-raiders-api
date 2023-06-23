@@ -4,25 +4,26 @@ import com.beust.klaxon.Klaxon
 import java.io.File
 import java.io.FileWriter
 import java.io.IOException
-import kotlin.math.min
 import galaxyraiders.core.score.GameScore
 
 abstract class BoardFile(private val fileName: String) {
 
-    data class Board(var games: List<GameScore>)
+    data class Board(var games: MutableList<GameScore>)
 
     val board = this.read()
+
+    var useLastGame = false
 
     private fun read(): Board {
         val file = File(fileName)
         if (!file.exists()) {
-            return Board(emptyList())
+            return Board(mutableListOf<GameScore>())
         }
         val jsonText = file.readText(Charsets.UTF_8)
         return Klaxon().parse<Board>(jsonText)!!
     }
 
-    abstract fun add(lastGame: GameScore)
+    abstract fun add(gameScore: GameScore)
 
     private fun write() {
         val jsonText = Klaxon()
@@ -37,24 +38,31 @@ abstract class BoardFile(private val fileName: String) {
         }
     }
 
-    fun update(lastGame: GameScore) {
-        this.add(lastGame)
+    fun update(gameScore: GameScore) {
+        if (useLastGame) {
+            this.board.games.removeLast()
+        } else {
+            useLastGame = true
+        }
+        this.add(gameScore)
         this.write()
     }
 }
 
 class ScoreboardFile:
-    BoardFile("galaxyraiders/core/score/Scoreboard.json") {
-    override fun add(lastGame: GameScore) {
-        this.board.games += lastGame
+    BoardFile("./src/main/kotlin/galaxyraiders/core/score/Scoreboard.json") {
+    override fun add(gameScore: GameScore) {
+        this.board.games.add(gameScore)
     }
 }
 
 class LeaderboardFile:
-    BoardFile("galaxyraiders/core/score/Leaderboard.json") {
-    override fun add(lastGame: GameScore) {
-        this.board.games += lastGame
-        this.board.games = this.board.games.sortedByDescending { it.finalScore }
-        this.board.games = this.board.games.subList(0,min(3,this.board.games.size))
+    BoardFile("./src/main/kotlin/galaxyraiders/core/score/Leaderboard.json") {
+    override fun add(gameScore: GameScore) {
+        this.board.games.add(gameScore)
+        this.board.games.sortByDescending { it.finalScore }
+        if (this.board.games.size > 3) {
+            this.board.games.removeLast()
+        }
     }
 }
