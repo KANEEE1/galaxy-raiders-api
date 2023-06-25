@@ -7,15 +7,14 @@ import java.io.IOException
 import galaxyraiders.core.score.GameScore
 
 abstract class BoardFile(private val fileName: String) {
-
     data class Board(var games: MutableList<GameScore>)
 
     val board: Board
+    var boardHasCurrentGame = false
 
     init {
         board = this.read()
-        this.firstTimeAdd(GameScore(0.0, 0))
-        this.write()
+        this.update(GameScore(0.0, 0))
     }
 
     private fun read(): Board {
@@ -27,7 +26,7 @@ abstract class BoardFile(private val fileName: String) {
         return Klaxon().parse<Board>(jsonText)!!
     }
 
-    abstract fun firstTimeAdd(gameScore: GameScore)
+    abstract fun removeCurrentGame()
 
     abstract fun add(gameScore: GameScore)
 
@@ -45,40 +44,45 @@ abstract class BoardFile(private val fileName: String) {
     }
 
     fun update(gameScore: GameScore) {
+        if (this.boardHasCurrentGame) {
+            this.removeCurrentGame()
+        }
         this.add(gameScore)
+        this.boardHasCurrentGame = true
         this.write()
     }
 }
 
 class ScoreboardFile:
     BoardFile("./src/main/kotlin/Scoreboard.json") {
-
-    override fun firstTimeAdd(gameScore: GameScore) {
-        this.board.games.add(gameScore)
+    override fun removeCurrentGame() {
+        this.board.games.removeLast()
     }
 
     override fun add(gameScore: GameScore) {
-        this.board.games.removeLast()
         this.board.games.add(gameScore)
     }
+
 }
 
 class LeaderboardFile:
     BoardFile("./src/main/kotlin/Leaderboard.json") {
-    private var previousIndexOfSameGame = -1
+    private var lastIndexOfCurrentGame = -1
 
-    override fun firstTimeAdd(gameScore: GameScore) {
-        /* Won't put in the leaderboard games with 0 asteroids destroyed */
+    override fun removeCurrentGame() {
+        if (lastIndexOfCurrentGame != -1) {
+            this.board.games.removeAt(lastIndexOfCurrentGame)
+        }
     }
 
     override fun add(gameScore: GameScore) {
-        if (previousIndexOfSameGame != -1) {
-            this.board.games.removeAt(previousIndexOfSameGame)
-        }
         val i = indexToAdd(gameScore)
-        previousIndexOfSameGame = i
+        lastIndexOfCurrentGame = i
         if (i != -1) {
             this.board.games.add(i, gameScore)
+            if (this.board.games.size == 4) {
+                this.board.games.removeLast()
+            }
         }
     }
 
