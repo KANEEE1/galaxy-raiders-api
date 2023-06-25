@@ -11,6 +11,7 @@ abstract class BoardFile(private val fileName: String) {
 
     val board: Board
     var boardHasCurrentGame = false
+    var lastIndexOfCurrentGame = -1
 
     init {
         board = this.read()
@@ -54,7 +55,7 @@ abstract class BoardFile(private val fileName: String) {
 }
 
 class ScoreboardFile:
-    BoardFile("./src/main/kotlin/Scoreboard.json") {
+    BoardFile("./src/main/kotlin/galaxyraiders/core/score/Scoreboard.json") {
     override fun removeCurrentGame() {
         this.board.games.removeLast()
     }
@@ -66,9 +67,7 @@ class ScoreboardFile:
 }
 
 class LeaderboardFile:
-    BoardFile("./src/main/kotlin/Leaderboard.json") {
-    private var lastIndexOfCurrentGame = -1
-
+    BoardFile("./src/main/kotlin/galaxyraiders/core/score/Leaderboard.json") {
     override fun removeCurrentGame() {
         if (lastIndexOfCurrentGame != -1) {
             this.board.games.removeAt(lastIndexOfCurrentGame)
